@@ -96,16 +96,13 @@ resource "vault_quota_rate_limit" "namespace-wide-quota" {
 
 # Create PKI mount 
 resource "vault_mount" "pki-benchmarking" {
-  depends_on  = [vault_namespace.new-namespace]
-  provider    = vault.new
-  path        = "pki-benchmarking"
-  type        = "pki"
-  description = "Mount PKI at its own path as not to break anything existing"
-
-  options = {
-    default_lease_ttl_seconds = 3600
-    max_lease_ttl_seconds     = 86400
-  }
+  depends_on                = [vault_namespace.new-namespace]
+  provider                  = vault.new
+  path                      = "pki-benchmarking"
+  type                      = "pki"
+  description               = "Mount PKI at its own path as not to break anything existing"
+  default_lease_ttl_seconds = 3600
+  max_lease_ttl_seconds     = 2592000
 }
 
 # Create role for PKI 
@@ -120,7 +117,6 @@ resource "vault_pki_secret_backend_role" "example_pki" {
   allowed_domains  = ["example.com", "my.domain"]
   allow_subdomains = true
   key_usage        = ["DigitalSignature", "KeyAgreement", "KeyEncipherment"]
-
 }
 
 # Generate self-signed internal CA
@@ -132,7 +128,7 @@ resource "vault_pki_secret_backend_root_cert" "example" {
 
   type                 = "internal"
   common_name          = "Root CA"
-  ttl                  = "315360000"
+  ttl                  = "315360001"
   format               = "pem"
   private_key_format   = "der"
   key_type             = "rsa"
